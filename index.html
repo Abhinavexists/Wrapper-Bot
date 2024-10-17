@@ -21,6 +21,7 @@
       <div class="container">
         <!-- Updated chat-heading and theme button for professional feel -->
         <h1 id="chat-heading">AI Chatbot</h1>
+        <button id="history-button">View History</button>
         <div id="theme-button">
           <img id="theme-icon" src="assets/theme-button/images/light-mode.png" alt="Theme Icon" />
         </div>
@@ -73,6 +74,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script src="renderer.js"></script>
   <script>hljs.highlightAll();</script>
+
+  <div id="history-modal" class="modal">
+    <div class="modal-content">
+      <h2>Chat History</h2>
+      <div id="history-container"></div>
+      <button id="clear-history">Clear History</button>
+      <button onclick="closeHistoryModal()">Close</button>
+    </div>
+  </div>
 </body>
 
 </html>

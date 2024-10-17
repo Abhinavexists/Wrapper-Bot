@@ -587,3 +587,28 @@ body.dark-theme .modal-content button:hover {
     padding: 4px 8px;
     border-radius: 5px; /* Add border-radius for consistency */
 }
+
+#history-button {
+    position: absolute;
+    top: 22px;
+    left: 20px;
+    padding: 7px 7px; /* Increased padding for a larger button */
+    background-color: #2079b8; /* Base color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 12px; /* Larger font size */
+    font-weight: bold; /* Bold text for emphasis */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+#history-button:hover {
+    background-color: #1565c0; /* Darker shade on hover */
+    transform: scale(1.05); /* Slightly increase size on hover */
+}
+
+#history-button:active {
+    transform: scale(0.95); /* Slightly decrease size when active */
+}
