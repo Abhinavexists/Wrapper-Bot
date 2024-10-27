@@ -1,30 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>AI Chatbot</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/agate.min.css" />
-  </head>
-  <body>
-    <main id="chat-container" aria-labelledby="chat-heading">
-      <header>
-        <!-- Container class added for better structure and spacing -->
-        <div class="container">
-          <!-- Updated chat-heading and theme button for professional feel -->
-          <h1 id="chat-heading">History</h1>
-          <!-- <button id="history-button">View History</button> -->
-          <div id="theme-button">
-            <img id="theme-icon" src="assets/theme-button/images/light-mode.png" alt="Theme Icon" />
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>AI Chatbot - History</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/agate.min.css" />
+  <style>
+    /* Basic styling for the layout */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #070707;
+      color: #ffffff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center; /* Center the main content */
+      height: 100vh; /* Full height */
+      overflow: hidden; /* Prevent scrollbars */
+    }
+
+    #chat-container {
+      width: 100%;
+      max-width: 600px;
+      height: 100%; /* Fill the full height */
+      display: flex;
+      flex-direction: column; /* Stack header and history */
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    .btn {
+      padding: 7px 10px;
+      background-color: #2079b8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #1565c0;
+      transform: scale(1.05);
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    #chat-heading {
+      font-size: 1.5rem;
+      margin: 0;
+      text-align: center;
+      flex-grow: 1;
+    }
+
+    #history-container {
+      flex-grow: 1; /* Take up available space */
+      overflow-y: auto; /* Scrollable if content is too long */
+      padding: 10px;
+      border: 1px solid #ffffff; /* Border for better visibility */
+      border-radius: 4px; /* Rounded corners */
+      display: flex;
+      flex-direction: column; /* Allow dynamic alignment */
+      gap: 10px; /* Space between messages */
+    }
+
+    /* Specific styles for the theme button */
+    #theme-button {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    #theme-icon {
+      width: 24px;
+      height: 24px;
+    }
+  </style>
+</head>
+<body>
+  <main id="chat-container" role="main" aria-labelledby="chat-heading">
+    <header>
+      <div class="container">
+        <button onclick="window.location.href='index.html'" class="btn">Return to Chat</button>
+        <h1 id="chat-heading">Chat History</h1>
+        <div id="theme-button" role="button" aria-label="Switch to dark theme" tabindex="0">
+          <img id="theme-icon" src="assets/theme-button/images/light-mode.png" alt="Switch theme icon" />
         </div>
-      </header>
-    </main>
-  </body>
+      </div>
+    </header>
+    
+    <div id="history-container">
+      <!-- The chat history messages will be dynamically added here -->
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>
+    // You can add JavaScript for the theme toggle and other functionalities here
+  </script>
+</body>
 </html>
