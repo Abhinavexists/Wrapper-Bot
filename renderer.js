@@ -1,5 +1,6 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { API_KEY } = require("./config");
+const { ipcRenderer } = require('electron');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { API_KEY } = require('./config');
 
 // getting the theme-button id and theme-icon id from the DOM
 const themeButton = document.getElementById('theme-button');
@@ -7,82 +8,80 @@ const themeIcon = document.getElementById('theme-icon');
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
-
 // Initialize GoogleGenerativeAI with the API key
 const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const inputElement = document.getElementById("input");
+document.addEventListener('DOMContentLoaded', () => {
+  const inputElement = document.getElementById('input');
 
   // Focus on the input field when the page loads
   inputElement.focus();
 
-  inputElement.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
+  inputElement.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
       event.preventDefault();
       sendMessage();
     }
   });
 
-  document.getElementById("send-button").addEventListener("click", () => {
+  document.getElementById('send-button').addEventListener('click', () => {
     sendMessage();
   });
 });
 
-
+document.getElementById('history-button').addEventListener('click', () => {
+  ipcRenderer.send('navigate-to-history');
+});
 
 // Image paths for light and dark mode icons
 const lightModeIcon = 'assets/theme-button/images/light-mode.png';
 const darkModeIcon = 'assets/theme-button/images/dark-mode.png';
 const themeLink = document.getElementById('hljs-theme');
 
-// Adding click eventListener to theme-button as 
-themeButton.addEventListener('click', function() {
-    // Toggle the "light-theme" class on the body
-    document.body.classList.toggle('light-theme');
-    
-    // Swap the image based on the active theme
-    if (document.body.classList.contains('light-theme')) {
-        themeIcon.src = darkModeIcon;  // Switch to dark mode icon
-        themeLink.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-light.min.css');
-      } else {
-        themeIcon.src = lightModeIcon;  // Switch to light mode icon
-        themeLink.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/agate.min.css');
-    }
+// Adding click eventListener to theme-button as
+themeButton.addEventListener('click', function () {
+  // Toggle the "light-theme" class on the body
+  document.body.classList.toggle('light-theme');
+
+  // Swap the image based on the active theme
+  if (document.body.classList.contains('light-theme')) {
+    themeIcon.src = darkModeIcon; // Switch to dark mode icon
+    themeLink.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-light.min.css');
+  } else {
+    themeIcon.src = lightModeIcon; // Switch to light mode icon
+    themeLink.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/agate.min.css');
+  }
 });
 
-
-function onFileIconClick(){
+function onFileIconClick() {
   document.getElementById('drag-drop-modal').style.display = 'block';
 }
 
-function onBrowseFileClick(){
+function onBrowseFileClick() {
   document.getElementById('file').click();
 }
 
-
-function closeModal(){
+function closeModal() {
   document.getElementById('drag-drop-modal').style.display = 'none';
 }
-
 
 // Store the selected file
 let selectedFile = null;
 
-document.getElementById("file").addEventListener("change", (event) => {
+document.getElementById('file').addEventListener('change', (event) => {
   document.getElementById('drag-drop-modal').style.display = 'none';
   const file = event.target.files[0];
 
   if (file) {
     if (file.size >= MAX_FILE_SIZE) {
-      alert("File size exceeds 20MB. Please select a smaller file.");
+      alert('File size exceeds 20MB. Please select a smaller file.');
       return; // Do not proceed if file size is too large
     }
   }
-  const previewContainer = document.getElementById("preview-container");
-  const previewImage = document.getElementById("preview-image");
-  const fileIconContainer = document.getElementById("file-icon-container");
+  const previewContainer = document.getElementById('preview-container');
+  const previewImage = document.getElementById('preview-image');
+  const fileIconContainer = document.getElementById('file-icon-container');
 
   if (file) {
     selectedFile = file;
@@ -105,36 +104,34 @@ document.getElementById("file").addEventListener("change", (event) => {
       previewImage.style.display = 'none';
     }
 
-    document.getElementById("fileName").textContent = file.name;
+    document.getElementById('fileName').textContent = file.name;
   }
 });
 
-
 // Drag and Drop functionality
-const dropArea = document.getElementById("drop-area");
+const dropArea = document.getElementById('drop-area');
 
-dropArea.addEventListener("dragover", (event) => {
+dropArea.addEventListener('dragover', (event) => {
   event.preventDefault(); // Prevent default behavior
-  dropArea.classList.add("drag-over"); // Optional: add visual feedback
+  dropArea.classList.add('drag-over'); // Optional: add visual feedback
 });
 
-dropArea.addEventListener("dragleave", () => {
-  dropArea.classList.remove("drag-over"); // Remove visual feedback
+dropArea.addEventListener('dragleave', () => {
+  dropArea.classList.remove('drag-over'); // Remove visual feedback
 });
 
-dropArea.addEventListener("drop", (event) => {
+dropArea.addEventListener('drop', (event) => {
   event.preventDefault(); // Prevent default behavior
-  dropArea.classList.remove("drag-over"); // Remove visual feedback
+  dropArea.classList.remove('drag-over'); // Remove visual feedback
   const files = event.dataTransfer.files;
   if (files.length) {
-    
-    closeModal()
+    closeModal();
     handleFiles(files);
   }
 });
 
 // Handle file selection from the file input
-document.getElementById("file").addEventListener("change", (event) => {
+document.getElementById('file').addEventListener('change', (event) => {
   const files = event.target.files;
   if (files.length) {
     handleFiles(files);
@@ -143,21 +140,19 @@ document.getElementById("file").addEventListener("change", (event) => {
 
 // Function to handle file uploads
 function handleFiles(files) {
-  
-  
   const file = files[0];
 
   if (file) {
     if (file.size >= MAX_FILE_SIZE) {
-      alert("File size exceeds 20MB. Please select a smaller file.");
+      alert('File size exceeds 20MB. Please select a smaller file.');
       return; // Do not proceed if file size is too large
     }
-    
+
     selectedFile = file; // Set the selected file
 
-    const previewContainer = document.getElementById("preview-container");
-    const previewImage = document.getElementById("preview-image");
-    const fileIconContainer = document.getElementById("file-icon-container");
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('preview-image');
+    const fileIconContainer = document.getElementById('file-icon-container');
 
     if (file.type.startsWith('image/')) {
       // If the file is an image, show the image preview
@@ -176,20 +171,19 @@ function handleFiles(files) {
       previewImage.style.display = 'none';
     }
 
-    document.getElementById("fileName").textContent = file.name;
+    document.getElementById('fileName').textContent = file.name;
   }
 }
 
-
 function removeFile() {
   selectedFile = null; // Resetting the selected file
-  
+
   // Resetting the preview
-  const previewImage = document.getElementById("preview-image");
-  const previewContainer = document.getElementById("preview-container");
-  const fileIconContainer = document.getElementById("file-icon-container");
-  const fileInput = document.getElementById("file");
-  
+  const previewImage = document.getElementById('preview-image');
+  const previewContainer = document.getElementById('preview-container');
+  const fileIconContainer = document.getElementById('file-icon-container');
+  const fileInput = document.getElementById('file');
+
   previewImage.src = ''; // Clear image source
   previewContainer.style.display = 'none'; // Hide preview container
   fileIconContainer.style.display = 'none'; // Hide file icon container
@@ -202,7 +196,7 @@ function fileToGenerativePart(file, mimeType) {
     const reader = new FileReader();
 
     reader.onloadend = function () {
-      const base64Data = reader.result.split(",")[1]; // Get base64 string without metadata
+      const base64Data = reader.result.split(',')[1]; // Get base64 string without metadata
       resolve({
         inlineData: {
           data: base64Data,
@@ -212,7 +206,7 @@ function fileToGenerativePart(file, mimeType) {
     };
 
     reader.onerror = function (error) {
-      reject("Error reading file: " + error);
+      reject('Error reading file: ' + error);
     };
 
     reader.readAsDataURL(file); // Read the file as a base64 Data URL
@@ -220,52 +214,52 @@ function fileToGenerativePart(file, mimeType) {
 }
 
 function sendMessage() {
-  const inputElement = document.getElementById("input");
+  const inputElement = document.getElementById('input');
   const userInput = inputElement.value.trim();
 
   // Prevent sending empty messages
-  if (userInput === "" && selectedFile === null) {
+  if (userInput === '' && selectedFile === null) {
     return;
   }
-  
-  document.getElementById("preview-container").style.display = 'none';
 
-  const chatDiv = document.getElementById("chat");
+  document.getElementById('preview-container').style.display = 'none';
+
+  const chatDiv = document.getElementById('chat');
 
   // Create a container for the user's message
-  const userMessageDiv = document.createElement("div");
-  userMessageDiv.classList.add("user");
+  const userMessageDiv = document.createElement('div');
+  userMessageDiv.classList.add('user');
 
   // Add user input to chat
   if (userInput) {
     userMessageDiv.innerHTML += `${escapeHTML(userInput)}`;
-    inputElement.value = ""; // Clear input after sending message
+    inputElement.value = ''; // Clear input after sending message
   }
 
   // Check if a file is selected
   if (selectedFile) {
-    if (selectedFile.type.startsWith("image/")) {
+    if (selectedFile.type.startsWith('image/')) {
       // Handle image file
-      const previewImage = document.createElement("img");
+      const previewImage = document.createElement('img');
       previewImage.src = URL.createObjectURL(selectedFile);
-      previewImage.alt = "Uploaded file preview";
-      previewImage.classList.add("response-image");
-      userMessageDiv.appendChild(document.createElement("br"));
+      previewImage.alt = 'Uploaded file preview';
+      previewImage.classList.add('response-image');
+      userMessageDiv.appendChild(document.createElement('br'));
       userMessageDiv.appendChild(previewImage);
     } else {
       // Handle non-image file: Add the file name and icon
-      const fileName = document.createElement("div");
-      fileName.classList.add("fileName");
+      const fileName = document.createElement('div');
+      fileName.classList.add('fileName');
 
       // Add the file icon
-      const fileIcon = document.createElement("i");
-      fileIcon.classList.add("fas", "fa-file");
-      fileIcon.style.fontSize = "24px";
-      fileIcon.style.marginRight = "8px";
+      const fileIcon = document.createElement('i');
+      fileIcon.classList.add('fas', 'fa-file');
+      fileIcon.style.fontSize = '24px';
+      fileIcon.style.marginRight = '8px';
 
       fileName.appendChild(fileIcon); // Append icon before the file name
       fileName.appendChild(document.createTextNode(selectedFile.name)); // Add file name
-      userMessageDiv.appendChild(document.createElement("br"));
+      userMessageDiv.appendChild(document.createElement('br'));
       userMessageDiv.appendChild(fileName);
     }
   }
@@ -275,47 +269,48 @@ function sendMessage() {
   chatDiv.scrollTop = chatDiv.scrollHeight;
 
   // Show typing indicator
-  const typingIndicator = document.createElement("div");
-  typingIndicator.classList.add("bot", "typing-indicator");
-  typingIndicator.innerText = "typing...";
+  const typingIndicator = document.createElement('div');
+  typingIndicator.classList.add('bot', 'typing-indicator');
+  typingIndicator.innerText = 'typing...';
   chatDiv.appendChild(typingIndicator);
   chatDiv.scrollTop = chatDiv.scrollHeight;
 
   // Generate bot response
-  generateContent(userInput).then((botMessage) => {
-    // Remove typing indicator
-    chatDiv.removeChild(typingIndicator);
+  generateContent(userInput)
+    .then((botMessage) => {
+      // Remove typing indicator
+      chatDiv.removeChild(typingIndicator);
 
-    const responseDiv = document.createElement("div");
-    responseDiv.classList.add("bot");
+      const responseDiv = document.createElement('div');
+      responseDiv.classList.add('bot');
 
-    // Handle bot response with an image (if any)
-    if (selectedFile && selectedFile.type.startsWith("image/")) {
-      const botImage = document.createElement("img");
-      botImage.src = URL.createObjectURL(selectedFile);
-      botImage.alt = "Uploaded file preview";
-      botImage.classList.add("response-image");
-      responseDiv.appendChild(botImage);
-      responseDiv.appendChild(document.createElement("br"));
-    }
+      // Handle bot response with an image (if any)
+      if (selectedFile && selectedFile.type.startsWith('image/')) {
+        const botImage = document.createElement('img');
+        botImage.src = URL.createObjectURL(selectedFile);
+        botImage.alt = 'Uploaded file preview';
+        botImage.classList.add('response-image');
+        responseDiv.appendChild(botImage);
+        responseDiv.appendChild(document.createElement('br'));
+      }
 
-    // Append the bot's message
-    responseDiv.innerHTML += formatMessage(botMessage);
-    chatDiv.appendChild(responseDiv);
-    chatDiv.scrollTop = chatDiv.scrollHeight;
+      // Append the bot's message
+      responseDiv.innerHTML += formatMessage(botMessage);
+      chatDiv.appendChild(responseDiv);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
 
-    // Clear the selected file and reset the input after the message is sent
-    selectedFile = null;
-    document.getElementById("preview-image").src = '';
-    document.getElementById("preview-container").style.display = 'none';
-    document.getElementById("file").value = '';
-    hljs.highlightAll()
-  }).catch((error) => {
-    chatDiv.innerHTML += `<div class="bot">${error}</div>`;
-    console.error("Error generating content:", error);
-  });
+      // Clear the selected file and reset the input after the message is sent
+      selectedFile = null;
+      document.getElementById('preview-image').src = '';
+      document.getElementById('preview-container').style.display = 'none';
+      document.getElementById('file').value = '';
+      hljs.highlightAll();
+    })
+    .catch((error) => {
+      chatDiv.innerHTML += `<div class="bot">${error}</div>`;
+      console.error('Error generating content:', error);
+    });
 }
-
 
 async function generateContent(prompt) {
   try {
@@ -327,36 +322,34 @@ async function generateContent(prompt) {
       const fileType = selectedFile.type;
 
       // Check for specific file types and set the MIME type accordingly
-      if (fileType.startsWith("image/")) {
-        mimeType = fileType;  // Pass image MIME type (e.g., "image/jpeg", "image/png")
-      } else if (fileType.startsWith("audio/")) {
-        mimeType = "audio/mp3";  // For audio
+      if (fileType.startsWith('image/')) {
+        mimeType = fileType; // Pass image MIME type (e.g., "image/jpeg", "image/png")
+      } else if (fileType.startsWith('audio/')) {
+        mimeType = 'audio/mp3'; // For audio
       } else {
         // Unsupported file type
         alert(`Unsupported file type. Please upload an image, video, or audio file. ${fileType}`);
         return;
       }
 
-      
       // Convert file to the part required by the API
       const filePart = await fileToGenerativePart(selectedFile, mimeType);
 
       // Send both the prompt and the file part
       result = await model.generateContent([prompt, filePart]);
 
-      console.log("File sent with prompt.");
+      console.log('File sent with prompt.');
     } else {
       // Only prompt provided, no file
       result = await model.generateContent([prompt]);
     }
 
-    return result.response.text();  // Return the generated response from the model
+    return result.response.text(); // Return the generated response from the model
   } catch (error) {
-    console.error("Error generating content:", error);
+    console.error('Error generating content:', error);
     throw error;
   }
 }
-
 
 function formatMessage(text) {
   let formattedText = formatBoldText(text);
@@ -368,44 +361,29 @@ function formatMessage(text) {
 }
 
 function formatBoldText(text) {
-  return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 }
 
-// function formatCodeBlocks(text) {
-//   return text.replace(
-//     /```([a-z]*)\n([\s\S]*?)```/g,
-//     (match, language, code) => {
-//       const languageClass = language ? ` language-${language}` : "";
-//       return `<div class="code-block-container">
-//           <button class="copy-button" onclick="copyCode(event)">Copy</button>
-//           <pre class="code-block${languageClass}"><code class="hljs">${escapeHTML(code)}</code></pre>
-//         </div>`;
-//     }
-//   );
-// }
 function formatCodeBlocks(text) {
-  return text.replace(
-    /```([a-z]*)\n([\s\S]*?)```/g,
-    (match, language, code) => {
-      const languageClass = language ? ` language-${language}` : "";
-      return `<div class="code-block-container">
+  return text.replace(/```([a-z]*)\n([\s\S]*?)```/g, (match, language, code) => {
+    const languageClass = language ? ` language-${language}` : '';
+    return `<div class="code-block-container">
           <button class="copy-button" onclick="copyCode(event)">Copy</button>
           <pre><code class="${languageClass} hljs">${escapeHTML(code)}</code></pre>
         </div>`;
-    }
-  );
+  });
 }
 
 function copyCode(event) {
-  const codeBlock = event.target.nextElementSibling.querySelector("code");
+  const codeBlock = event.target.nextElementSibling.querySelector('code');
   const code = codeBlock.textContent;
   navigator.clipboard
     .writeText(code)
     .then(() => {
-      console.log("Code copied to clipboard");
+      console.log('Code copied to clipboard');
     })
     .catch((error) => {
-      console.error("Error copying code:", error);
+      console.error('Error copying code:', error);
     });
 }
 
@@ -413,24 +391,16 @@ function formatLists(text) {
   return text
     .replace(/^\s*[-*+]\s+(.*)$/gm, (match, listItem) => `<li>${listItem}</li>`)
     .replace(/^\s*\d+\.\s+(.*)$/gm, (match, listItem) => `<li>${listItem}</li>`)
-    .replace(/<\/li>\s*<\/li>/g, "</li><li>")
+    .replace(/<\/li>\s*<\/li>/g, '</li><li>')
     .replace(/<li>(.*)<\/li>/g, (match, listItem) => `<li>${listItem}</li>`);
 }
 
 function escapeHTML(text) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 function formatLinks(text) {
-  return text.replace(
-    /\b(https?:\/\/[^\s]+)\b/g,
-    '<a href="$1" target="_blank">$1</a>'
-  );
+  return text.replace(/\b(https?:\/\/[^\s]+)\b/g, '<a href="$1" target="_blank">$1</a>');
 }
 
 function formatHeadings(text) {
@@ -439,4 +409,3 @@ function formatHeadings(text) {
     return `<h${level} class="heading-${level}">${headingText}</h${level}>`;
   });
 }
-

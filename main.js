@@ -1,6 +1,6 @@
-const { app, BrowserWindow, screen } = require("electron");
-const settings = require("./config");
-const { createMenu } = require("./menu");
+const { app, BrowserWindow, screen, ipcMain } = require('electron');
+const settings = require('./config');
+const { createMenu } = require('./menu');
 
 let mainWindow;
 
@@ -32,25 +32,29 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile("index.html");
+  mainWindow.loadFile('index.html');
 
   // Create the UI menu for window positioning and other options
   createMenu(mainWindow);
 }
 
 // Handle app lifecycle
-app.on("ready", createWindow);
+app.on('ready', createWindow);
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-app.on("activate", () => {
+app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
 
 app.disableHardwareAcceleration();
+
+ipcMain.on('navigate-to-history', () => {
+  mainWindow.loadFile('history.html');
+});
